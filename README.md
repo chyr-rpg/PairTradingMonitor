@@ -38,7 +38,22 @@ Every automatic alert and every `/context`/`/pair` response includes a chart, so
 
 ## Coverage
 
-US large/mid-cap stocks across major sectors, plus broad-market and sector ETFs (SPY, QQQ, DIA, XLK, XLF, XLE, XLV, and more) — extended trading-session data, so nothing is missed between the regular close and the next open.
+Top 100 US large stocks across major sectors, plus broad-market and sector ETFs (SPY, QQQ, DIA, XLK, XLF, XLE, XLV, and more) — extended trading-session data, so nothing is missed between the regular close and the next open.
+
+## Project Status
+
+PairMonitor is currently operating in a **limited trial stage**.
+
+The project is not intended to be a permanently free public service. Trial access
+is currently being used to evaluate signal quality, usability, infrastructure
+requirements and user feedback before a broader subscription release.
+
+A paid subscription model is planned following the trial stage.
+
+Final plan features, pricing and access terms will be published through the
+official PairMonitor subscription page when the commercial service launches.
+
+Early trial users and founding subscribers may receive separate launch terms.
 
 ## Getting started
 
