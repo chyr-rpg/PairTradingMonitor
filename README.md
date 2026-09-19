@@ -245,8 +245,6 @@ Future access, subscription plans, supported coverage and features may change as
 
 ## Development Philosophy
 
-PairMonitor started from a research question rather than from the assumption that pair trading automatically works.
-
 The project continues to investigate:
 
 > **Can data-driven pair selection identify relationships that provide useful market context?**
