@@ -122,6 +122,12 @@ Signals are intended to complement broader market, fundamental and risk analysis
 
 ---
 
+### Example Telegram Alert
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/94d6f1e5-d0f6-4aa8-8f36-ae8c154184cb" />
+
+PairMonitor alerts include the current pair relationship, model signal, quality score, recent signal history and a chart showing the underlying relative-price behaviour.
+
 ## What You Can Do With It
 
 | Command | What it does |
