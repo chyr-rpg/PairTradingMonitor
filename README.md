@@ -2,7 +2,7 @@
 
 **A relative-value research and signal-monitoring system using unsupervised learning and statistical pair analysis across US stocks and ETFs, delivered through Telegram.**
 
-> 🧪 **Limited Trial Access:** [Open PairResearchBot](https://t.me/PairResearchBot)
+> 🧪 **Limited Trial Access:** [Open PairMonitorBot](https://t.me/PairResearchBot)
 >
 > PairMonitor is currently in a limited trial stage. Access may be granted temporarily while the system is being evaluated ahead of a broader commercial release.
 
