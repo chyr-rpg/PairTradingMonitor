@@ -1,6 +1,6 @@
 # PairMonitor
 
-**A statistical pair-trading signal bot for US stocks and ETFs, delivered straight to Telegram.**
+**A pair-trading signal bot using unsupervised learning and statistical research for relative-price analysis on US stocks and ETFs, delivered straight to Telegram.**
 
 > 👉 **Try it now: [t.me/PairResearchBot](https://t.me/PairResearchBot)**
 
@@ -15,6 +15,7 @@ Instead of tracking a stock's price in isolation, PairMonitor asks a more useful
 ## Why market researchers and analysts use it
 
 - **Objective and systematic.** Every alert comes from a rules-based statistical model, not discretionary chart-reading — useful as an independent, repeatable signal to cross-check your own thesis against.
+- **Unsupervised machine learning.** Clustering is used to select price pairs for selected target stocks and rank most confidently relevant pairs for market research, price analysis and signal delivery.
 - **Relative-value, market-neutral lens.** Pair analysis strips out broad market noise, surfacing moves that are specific to a stock relative to its sector or comparison instrument — a genuinely different angle from single-name technicals.
 - **Two independent models, one view.** A Residual-spread engine and an optional Price-spread engine each score signals independently; seeing both agree (or disagree) is itself useful research signal.
 - **Always watching, never tired.** Signals are evaluated every hour against freshly closed price bars — you get notified, you don't have to go looking.
