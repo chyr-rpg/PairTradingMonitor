@@ -35,6 +35,8 @@ Instead of tracking a stock's price in isolation, PairMonitor asks a more useful
 
 Every automatic alert and every `/context`/`/pair` response includes a chart, so you're never just trusting a text label.
 
+👉 See a real example of what these look like: **[SAMPLE_ALERT.md](SAMPLE_ALERT.md)**
+
 ## Coverage
 
 US large/mid-cap stocks across major sectors, plus broad-market and sector ETFs (SPY, QQQ, DIA, XLK, XLF, XLE, XLV, and more) — extended trading-session data, so nothing is missed between the regular close and the next open.
@@ -46,6 +48,8 @@ US large/mid-cap stocks across major sectors, plus broad-market and sector ETFs 
 3. Set your watchlist with `/setlist` and you're live.
 
 Access is currently by invite/trial — message the bot to get started, and you may be granted a short trial period to see it in action.
+
+Questions? Check the **[FAQ](FAQ.md)** first.
 
 ---
 
