@@ -2,7 +2,7 @@
 
 **A statistical pair-trading signal bot for US stocks and ETFs, delivered straight to Telegram.**
 
-> 👉 **Try it now: [PUT_YOUR_BOT_LINK_HERE]** *(replace before publishing)*
+> 👉 **Try it now: [t.me/PairResearchBot](https://t.me/PairResearchBot)**
 
 ---
 
@@ -41,7 +41,7 @@ US large/mid-cap stocks across major sectors, plus broad-market and sector ETFs 
 
 ## Getting started
 
-1. Open the bot: **[PUT_YOUR_BOT_LINK_HERE]**
+1. Open the bot: **[t.me/PairResearchBot](https://t.me/PairResearchBot)**
 2. Send it any message — you'll get a welcome guide back immediately.
 3. Set your watchlist with `/setlist` and you're live.
 
