@@ -9,6 +9,13 @@ them as a plain green/red bar subplot underneath. Deliberately unlabeled:
 no signal names, no score values, no legend calling it anything -- just
 the bars.
 
+Extreme-level display (added 2026-09-21): bars beyond +/-EXTREME_Z are
+drawn in a bold shade, bars within it in a pale shade of the same color --
+so whether the spread is currently beyond the extreme level, or has faded
+back from it, is visible directly from each bar's own shade as it moves
+bar to bar, with no text or numbers added. Two thin dashed reference lines
+mark the +/-EXTREME_Z level itself.
+
 Fully standalone. Does not import or depend on any other project in this
 environment.
 
@@ -42,6 +49,13 @@ except ImportError as exc:  # pragma: no cover - environment setup issue, not a 
 INTERVAL = "1h"
 LOOKBACK_DAYS = 90  # yfinance allows up to 730 days of 1h data; 90 keeps fetch/plot snappy
 SPREAD_WINDOW = 20  # bars used for the rolling mean/std that normalizes the spread
+EXTREME_Z = 2.0  # preset extreme-level threshold, in the same Z units as the spread itself
+
+COLOR_POSITIVE_NORMAL = "#a8dba8"
+COLOR_POSITIVE_EXTREME = "#2ca02c"
+COLOR_NEGATIVE_NORMAL = "#f2a9a9"
+COLOR_NEGATIVE_EXTREME = "#d62728"
+COLOR_EXTREME_LINE = "#888888"
 
 
 def fetch_price_series(ticker: str) -> pd.Series:
@@ -84,6 +98,25 @@ def compute_price_spread(target: pd.Series, compared: pd.Series, window: int = S
             f"Not enough overlapping bars to compute a {window}-bar spread. "
             "Try a more actively traded pair.")
     return z
+
+
+def _extreme_level_colors(values: np.ndarray, extreme_z: float = EXTREME_Z) -> list[str]:
+    """One color per bar: bold green/red once the spread is beyond
+    +/-extreme_z, pale green/red while it's within that range. The
+    transition itself (pale->bold, bold->pale) is what shows the spread
+    exceeding or fading from the extreme level -- no separate state or
+    text is tracked, each bar's color reflects only its own value."""
+    colors = []
+    for value in values:
+        if value >= extreme_z:
+            colors.append(COLOR_POSITIVE_EXTREME)
+        elif value >= 0:
+            colors.append(COLOR_POSITIVE_NORMAL)
+        elif value > -extreme_z:
+            colors.append(COLOR_NEGATIVE_NORMAL)
+        else:
+            colors.append(COLOR_NEGATIVE_EXTREME)
+    return colors
 
 
 def _sparse_date_ticks(index: pd.DatetimeIndex, count: int = 8) -> tuple[list[int], list[str]]:
@@ -182,9 +215,13 @@ class PairSpreadApp(tk.Tk):
         lines2, labels2 = self.price_ax2.get_legend_handles_labels()
         self.price_ax.legend(lines1 + lines2, labels1 + labels2, loc="upper left", fontsize=9)
 
-        colors = np.where(spread.values >= 0, "#2ca02c", "#d62728")
+        colors = _extreme_level_colors(spread.values)
         self.spread_ax.bar(x, spread.values, color=colors, width=0.9)
         self.spread_ax.axhline(0, color="black", linewidth=0.7)
+        self.spread_ax.axhline(EXTREME_Z, color=COLOR_EXTREME_LINE, linewidth=0.7, linestyle="--")
+        self.spread_ax.axhline(-EXTREME_Z, color=COLOR_EXTREME_LINE, linewidth=0.7, linestyle="--")
+        spread_limit = max(EXTREME_Z * 1.1, float(np.abs(spread.values).max()) * 1.05)
+        self.spread_ax.set_ylim(-spread_limit, spread_limit)
         self.spread_ax.set_yticks([])
 
         tick_positions, tick_labels = _sparse_date_ticks(common_index)
