@@ -1,43 +1,27 @@
 # PairMonitor
 
-**A relative-value research and signal-monitoring system using unsupervised learning and statistical pair analysis across US stocks and ETFs, delivered through Telegram.**
+PairMonitor is designed to explore an interesting question in quantitative trading:
 
-> 🧪 **Limited Trial Access:** [Open PairMonitorBot](https://t.me/PairResearchBot)
->
-> PairMonitor is currently in a limited trial stage. Access may be granted temporarily while the system is being evaluated ahead of a broader commercial release.
+> **Can statistical methodologies identify useful relationships across different market instruments, and reveal relative-value opportunities that single-price analysis cannot capture?**
 
----
+I am currently focuseing on US stocks and ETFs but will expand to multi-market instruments.
 
-## What is PairMonitor?
+It combines unsupervised clustering for pair discovery, statistical models for spread analysis, relative-value monitoring, and a Telegram bot that automatically tracks selected relationships.
 
-PairMonitor monitors relationships between US stocks, sector ETFs and broad-market ETFs such as SPY, QQQ and DIA.
+This repository *documents the main research ideas* and provides price-spread-based indicator behind PairMonitor.
 
-Instead of analysing a stock only through its own price history, PairMonitor asks a relative question:
+It is **not the full production codebase used by the live bot**.
 
-> **Is this stock behaving unusually compared with instruments that have historically shown meaningful relationships with it?**
+## Why I built it
 
-The system evaluates pair relationships after newly closed hourly bars and highlights statistically unusual divergence, convergence and relative-momentum conditions.
+Finding a useful comparison instrument is not always straightforward.
 
-The objective is not to tell users what to buy or sell.
+Two stocks from the same sector can behave very differently. At the same time, instruments from different classifications can sometimes show stronger statistical relationships.
 
-It is to surface **relative-price behaviour that may deserve further investigation**.
+This led me to explore whether **unsupervised clustering can narrow a large market universe into more meaningful comparison candidates** and what **statistical models can identify mispricing opportunities more effectively**.
 
----
 
-## Why I Built It
-
-PairMonitor is a **personal, independently developed quantitative research project**.
-
-One of the original research questions behind the project were:
-
-> **To what extent can unsupervised clustering help identify useful instruments for pair and relative-value research?**
-> **To what extent can residual spread and price spread based statistical models help identify opportunties from relative price valuation?** 
-
-Selecting a good comparison instrument is not always obvious.
-
-Two companies may belong to the same sector but behave very differently, while instruments from different classifications may still exhibit useful statistical relationships.
-
-PairMonitor therefore explores a two-stage idea:
+## Research workflow
 
 ```text
 Market Universe
@@ -46,233 +30,199 @@ Feature Construction
       ↓
 Unsupervised Clustering
       ↓
-Comparable-Instrument Candidates
+Candidate Pairs
       ↓
 Pair-Level Statistical Analysis
       ↓
-Signal & Context Monitoring
+Relative-Value Monitoring
+      ↓
+Alerts / Research Context
 ```
 
-Clustering is used as a **candidate-selection mechanism**, not as proof that two instruments form a good trading pair.
+Clustering is only used to **identify possible candidates**.
 
-The broader research challenge is to determine which candidate relationships remain statistically meaningful enough to provide useful relative-price context.
+It does not prove that two instruments form a meaningful or stable pair.
 
----
+Some of the characteristics I currently study include:
 
-## What Makes a Useful Pair?
+* historical co-movement,
+* correlation,
+* residual behaviour,
+* mean reversion,
+* relative momentum,
+* sector context,
+* and relationship stability over time.
 
-PairMonitor does not assume that two instruments form a useful pair simply because they appear in the same cluster.
+The objective is to understand whether a relationship contains useful relative-value information rather than simply showing short-term correlation.
 
-Candidate relationships can also be evaluated through characteristics such as:
+## Public examples
+
+The production PairMonitor system will remain private.
+
+However, I plan to share small and understandable examples of the main statistical ideas used in the research.
+
+### Price Spread
+
+The first public example is:
+
+[`src/pair_spread_viewer.py`](src/pair_spread_viewer.py)
+
+The script:
+
+* downloads recent hourly prices,
+* aligns two instruments,
+* calculates their log-price spread,
+* normalizes the spread using a rolling Z-score,
+* and highlights observations that are relatively extreme compared with recent history.
+
+![SPY vs DIA price spread](src/spy_vs_dia.png)
+
+The simplified calculation is:
 
 ```text
-Historical Co-Movement
-Relative-Price Stability
-Residual Behaviour
-Correlation
-Mean-Reversion Characteristics
-Signal Consistency
-Market / Sector Relationship
-and Data Availability
+Spread = log(Target Price) - log(Comparison Price)
+
+                  Spread - Rolling Mean
+Z-Score = -----------------------------------
+                  Rolling Standard Deviation
 ```
 
-A statistically related pair is not necessarily a profitable trading opportunity.
+A large positive or negative Z-score means the current spread is unusual relative to its recent history.
 
-Relationships can also weaken, change or disappear as market conditions evolve.
+It does **not** automatically imply mean reversion, mispricing, or a trading opportunity.
 
-For this reason, PairMonitor is designed primarily as a **research and monitoring system**, rather than as an automatic pair-trading execution engine.
+### Planned examples
 
----
-
-## Why Market Researchers and Analysts May Find It Useful
-
-- **Objective and systematic.** Alerts are generated from repeatable statistical rules rather than discretionary chart interpretation, providing an independent input that can be compared with an existing market view.
-
-- **Unsupervised pair discovery.** Clustering helps narrow a large market universe into potentially relevant comparison candidates for selected target stocks.
-
-- **Relative-value perspective.** Pair analysis can help separate broad market movement from behaviour that appears unusual relative to a sector, ETF or comparable instrument.
-
-- **Two analytical engines.** A Residual-spread model and an optional Price-spread model evaluate the same relationship independently. Agreement or disagreement between the two can itself provide additional research context.
-
-- **Continuous monitoring.** Relationships are re-evaluated after newly closed hourly bars so users do not need to manually monitor every pair.
-
-- **Context rather than labels alone.** Alerts include model scores and charts so users can inspect the underlying relationship rather than relying only on a text signal.
-
----
-
-## What Does a PairMonitor Signal Mean?
-
-A PairMonitor signal means that the relationship between two instruments has reached a condition identified by one of the system's statistical models.
-
-It does **not** mean:
+I also plan to add:
 
 ```text
-Guaranteed Mispricing
-Guaranteed Mean Reversion
-Guaranteed Direction
-Automatic Buy / Sell Recommendation
-or Guaranteed Profit
+Price Spread — Python
+Price Spread — Pine Script
 ```
 
-A signal is better interpreted as:
+These public examples will focus on the statistical concepts rather than reproducing PairMonitor's complete signal-generation logic.
 
-> **Something statistically unusual is happening in this relative-price relationship and may be worth investigating.**
+## Residual spread
 
-Signals are intended to complement broader market, fundamental and risk analysis.
+Another area I am researching is regression-based residual analysis.
 
----
-
-### Example Telegram Alert
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/94d6f1e5-d0f6-4aa8-8f36-ae8c154184cb" />
-
-PairMonitor alerts include the current pair relationship, model signal, quality score, recent signal history and a chart showing the underlying relative-price behaviour.
-
-## What You Can Do With It
-
-| Command | What it does |
-|---|---|
-| `/watchlist` | See and manage the stocks/ETFs you're following |
-| `/setlist`, `/addstock`, `/removestock` | Build your personal watchlist |
-| `/coverage`, `/coverage etf` | Browse supported stocks and ETFs |
-| `/context TICKER` | View the current relative-value context for a target across its comparison pairs |
-| `/pair TARGET COMPONENT` | Inspect one specific pair on demand, including its chart |
-| `/addpair TARGET COMPONENT` | Follow a custom pair you're personally interested in |
-| `/tracked`, `/untrack` | Manage the pairs you're actively following |
-| `/priceon`, `/priceoff` | Enable or disable the secondary Price-spread model |
-
-Automatic alerts and `/context` / `/pair` responses include charts so the underlying relationship can be inspected visually.
-
-👉 See real example outputs: **[sample_screenshots](sample_screenshots/)**
-
----
-
-## Coverage
-
-Current coverage focuses on approximately **100 large US stocks** across major sectors, together with broad-market and sector ETFs including:
+The basic idea is:
 
 ```text
-SPY
-QQQ
-DIA
-XLK
-XLF
-XLE
-XLV
-and others
+Target
+   ↓
+Regression against comparison instrument
+   ↓
+Estimated relationship
+   ↓
+Observed Target - Model Estimate
+   ↓
+Residual
+   ↓
+Standardized Residual Behaviour
 ```
 
-Extended-session market data is incorporated where supported so that relative-price changes outside the regular trading session can also contribute to the analysis.
+Instead of comparing two prices directly, the regression estimates how the target usually behaves relative to the comparison instrument.
 
-Coverage may continue to expand as the research and infrastructure develop.
+The residual then measures how far the observed target price deviates from that estimated relationship.
 
----
+This provides another way to study whether one instrument is behaving unusually relative to another.
 
-## Project Status
+## Telegram bot
 
-PairMonitor is currently operating in a **limited trial stage**.
+The research eventually developed into a Telegram bot that monitors selected relationships automatically.
 
-The project is not intended to remain a permanently free public service.
+The bot currently provides:
 
-Trial access is currently being used to evaluate:
+* relative-value alerts,
+* pair charts,
+* signal context,
+* watchlists,
+* and on-demand pair analysis.
+
+Using signals for Meta as an example here:
+22 September 
+<img width="649" height="659" alt="image" src="https://github.com/user-attachments/assets/b623ff9e-1c52-46ae-8a27-c20973bc76f4" />
+21 September
+<img width="626" height="684" alt="image" src="https://github.com/user-attachments/assets/b3a66485-6f55-4e4d-99eb-40d0c2a3bfe3" />
+21 September
+<img width="603" height="673" alt="image" src="https://github.com/user-attachments/assets/f2018ed7-a520-41fe-a54c-e598e014362e" />
+18 September
+<img width="645" height="676" alt="image" src="https://github.com/user-attachments/assets/89f65628-53d8-49ae-8eb2-0310c3d91f6d" />
+
+The bot is currently running as a **limited trial**:
+
+[Open PairMonitorBot](https://t.me/PairResearchBot)
+
+It runs independently on lightweight cloud infrastructure.
+
+The bot should be viewed as an active research environment rather than a production-grade financial service.
+
+## What a signal means
+
+A PairMonitor signal is intended to mean:
+
+> **The relationship between two instruments currently looks statistically unusual enough to investigate further.**
+
+It give score of the unusual pair relationship based spread volaitltiy but does not imply guaranteed mean reversion, future direction, or a buy or sell recommendation. *The signal is simply a way to identify relationships that may deserve closer analysis.*
+
+## What remains private
+
+The live PairMonitor system contains additional research and production logic that is not included in this repository.
+
+This includes:
+
+* production pair ranking,
+* the full clustering workflow,
+* signal classification,
+* quality scoring,
+* threshold calibration,
+* multi-timeframe context,
+* and Telegram infrastructure.
+
+The goal of this repository is to make the research ideas understandable and reproducible without turning the public version into a copy of the production system.
+
+## Run the Python example
+
+Install the required dependencies:
+
+```bash
+pip install yfinance pandas numpy matplotlib
+```
+
+Run:
+
+```bash
+python src/pair_spread_viewer.py
+```
+
+Example:
 
 ```text
-Signal Quality
-User Experience
-Pair Selection
-Infrastructure Requirements
-Alert Reliability
-and User Feedback
+Target: SPY
+Compared: DIA
+
+<img width="1150" height="730" alt="spy_vs_dia" src="https://github.com/user-attachments/assets/21ca7216-0469-454e-9c77-db078e9266fa" />
+
 ```
 
-A paid subscription model is planned following the trial stage.
+## Current research questions
 
-Final plan features, pricing and access terms will be published through the official PairMonitor subscription page when the commercial service launches.
+There are still several questions I am exploring:
 
-Early trial users and founding subscribers may receive separate launch terms.
+* Can clustering actually improve pair discovery?
+* What statistical models other than residual from beta can be applied?
+* How we can optimize the threshold parameters to identify a better extreme level of the relationship between a pair
+* How much historical stability should be required before monitoring a pair?
 
----
+These questions are still part of the research process rather than settled conclusions.
 
-## Infrastructure & Availability
-
-PairMonitor is independently operated on **lightweight cloud infrastructure** during its current trial stage.
-
-Because the project is still being actively developed:
-
-- response times may occasionally vary,
-- development or maintenance may temporarily interrupt service,
-- coverage and processing schedules may change,
-- and Telegram delivery should not be interpreted as guaranteed real-time infrastructure.
-
-There is currently no service-level agreement or guaranteed uptime.
-
-Infrastructure will be expanded progressively as usage and product requirements increase.
-
----
-
-## Current Research Areas
-
-PairMonitor remains an active research project.
-
-Current areas of development include:
-
-```text
-Clustering & Pair Candidate Selection
-Relative-Price Modelling
-Residual Analysis
-Signal Quality Scoring
-Multi-Timeframe Context
-Alert Filtering
-Historical Signal Evaluation
-Pair Stability
-and Infrastructure Reliability
-```
-
-Not every experimental feature is necessarily enabled in the Telegram bot, and the methodology may evolve as additional testing is completed.
-
----
-
-## Getting Started
-
-1. Open the bot: **[t.me/PairResearchBot](https://t.me/PairResearchBot)**
-2. Send the bot a message to receive the current introduction and access information.
-3. Once trial access is enabled, use `/setlist` to configure your research watchlist.
-4. Use `/context TICKER` or `/pair TARGET COMPONENT` to explore relationships directly.
-
-### Trial Access
-
-PairMonitor is currently available only through **limited trial access**.
-
-The trial is intended to allow selected users to experience the system while signal behaviour, usability and infrastructure continue to be evaluated.
-
-The bot should not be interpreted as a permanently free service.
-
-Future access, subscription plans, supported coverage and features may change as the project develops.
-
-Questions? Check the **[FAQ](FAQ.md)** first.
-
----
-
-## Development Philosophy
-
-The project continues to investigate:
-
-> **Can data-driven pair selection identify relationships that provide useful market context?**
-
-and:
-
-> **What characteristics distinguish a genuinely useful research pair from two instruments that merely happened to move together historically?**
-
-The Telegram bot is the practical layer built around those questions: continuously monitoring selected relationships and making the resulting analysis easier to consume.
-
----
+Feedback, technical discussion, and alternative approaches are welcome.
 
 ## Disclaimer
 
-PairMonitor provides systematic, model-generated information for **market research and educational purposes only**.
+PairMonitor is a personal quantitative research and educational project.
 
-Nothing generated by the system constitutes financial advice, a recommendation to buy or sell any security, or a representation of future investment performance.
+Nothing in this repository or the associated Telegram bot constitutes financial advice, an investment recommendation, or a representation of future performance.
 
-Statistical relationships can weaken or fail, and historical signal behaviour does not guarantee future results.
-
-Users should independently evaluate any market information before making investment decisions.
+Statistical relationships can weaken, change, or disappear completely. Historical relationships do not guarantee future behaviour.
