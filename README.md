@@ -140,14 +140,14 @@ The bot currently provides:
 * watchlists,
 * and on-demand pair analysis.
 
-Using signals for Meta as an example here:
-22 September 
+Using signals for Meta from 22 Sep 2026 back to 18 Sep 2026 as an example here:
+
 <img width="649" height="659" alt="image" src="https://github.com/user-attachments/assets/b623ff9e-1c52-46ae-8a27-c20973bc76f4" />
-21 September
+
 <img width="626" height="684" alt="image" src="https://github.com/user-attachments/assets/b3a66485-6f55-4e4d-99eb-40d0c2a3bfe3" />
-21 September
+
 <img width="603" height="673" alt="image" src="https://github.com/user-attachments/assets/f2018ed7-a520-41fe-a54c-e598e014362e" />
-18 September
+
 <img width="645" height="676" alt="image" src="https://github.com/user-attachments/assets/89f65628-53d8-49ae-8eb2-0310c3d91f6d" />
 
 The bot is currently running as a **limited trial**:
