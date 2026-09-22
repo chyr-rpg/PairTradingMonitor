@@ -1,0 +1,219 @@
+//@version=6
+indicator(
+     "PairMonitor - Price Spread",
+     shorttitle = "Pair Spread",
+     overlay = false,
+     precision = 2
+)
+
+// ============================================================================
+// PairMonitor - simplified public price-spread example
+//
+// Mirrors the standalone Python example:
+//   1) log(Target) - log(Compared)
+//   2) rolling mean / population standard deviation
+//   3) rolling Z-score
+//   4) four histogram colors depending on sign and +/- extreme threshold
+//
+// Best visual match to the Python example: use this on a 1-hour chart with
+// Analysis timeframe = 60.
+// ============================================================================
+
+// ----- Inputs
+string GROUP_PAIR  = "Pair"
+string GROUP_MODEL = "Spread settings"
+string GROUP_VIS   = "Display"
+
+bool useChartTarget = input.bool(
+     true,
+     "Use chart symbol as target",
+     group = GROUP_PAIR,
+     tooltip = "When enabled, the current TradingView chart symbol is the target instrument."
+)
+
+string targetInput = input.symbol(
+     "AMEX:SPY",
+     "Target symbol",
+     group = GROUP_PAIR,
+     active = not useChartTarget
+)
+
+string comparedSymbol = input.symbol(
+     "NASDAQ:QQQ",
+     "Compared symbol",
+     group = GROUP_PAIR
+)
+
+string analysisTf = input.timeframe(
+     "60",
+     "Analysis timeframe",
+     group = GROUP_PAIR,
+     tooltip = "The Python example uses 1-hour data, so 60 is the closest match."
+)
+
+int spreadWindow = input.int(
+     20,
+     "Rolling window",
+     minval = 2,
+     group = GROUP_MODEL,
+     tooltip = "Number of bars used for the rolling mean and standard deviation."
+)
+
+float extremeZ = input.float(
+     2.0,
+     "Extreme level",
+     minval = 0.1,
+     step = 0.1,
+     group = GROUP_MODEL
+)
+
+bool showFadeMarkers = input.bool(
+     true,
+     "Mark fades from extreme",
+     group = GROUP_VIS,
+     tooltip = "Marks the first bar that moves back inside the +/- extreme threshold."
+)
+
+bool showPriceChartFadeLabels = input.bool(
+     true,
+     "Also label fades on main price chart",
+     group = GROUP_VIS,
+     tooltip = "Main-chart labels are shown only when the chart symbol is used as the target and the chart timeframe matches the analysis timeframe."
+)
+
+// ----- Colors matching the Python version
+color POSITIVE_NORMAL  = color.rgb(168, 219, 168) // #a8dba8
+color POSITIVE_EXTREME = color.rgb(44, 160, 44)   // #2ca02c
+color NEGATIVE_NORMAL  = color.rgb(242, 169, 169) // #f2a9a9
+color NEGATIVE_EXTREME = color.rgb(214, 39, 40)   // #d62728
+color EXTREME_LINE     = color.rgb(136, 136, 136) // #888888
+
+// ----- Data
+string targetSymbol = useChartTarget ? syminfo.tickerid : targetInput
+
+float targetClose = request.security(
+     targetSymbol,
+     analysisTf,
+     close,
+     gaps = barmerge.gaps_off,
+     lookahead = barmerge.lookahead_off
+)
+
+float comparedClose = request.security(
+     comparedSymbol,
+     analysisTf,
+     close,
+     gaps = barmerge.gaps_off,
+     lookahead = barmerge.lookahead_off
+)
+
+// ----- Price spread
+bool validPrices = not na(targetClose) and not na(comparedClose) and targetClose > 0 and comparedClose > 0
+
+float logSpread = validPrices ? math.log(targetClose) - math.log(comparedClose) : na
+
+float rollingMean = ta.sma(logSpread, spreadWindow)
+
+// `true` uses the biased/population standard deviation, matching numpy.std(ddof=0)
+// used by the Python example.
+float rollingStd = ta.stdev(logSpread, spreadWindow, true)
+
+float z = not na(rollingStd) and rollingStd != 0.0
+     ? (logSpread - rollingMean) / rollingStd
+     : na
+
+// ----- Histogram coloring
+color spreadColor =
+     z >= extremeZ  ? POSITIVE_EXTREME :
+     z >= 0.0       ? POSITIVE_NORMAL :
+     z > -extremeZ  ? NEGATIVE_NORMAL :
+                       NEGATIVE_EXTREME
+
+plot(
+     z,
+     title = "Price-spread Z-score",
+     style = plot.style_columns,
+     histbase = 0.0,
+     color = spreadColor,
+     linewidth = 1
+)
+
+// Same reference levels as the Python visualization.
+hline(0.0, "Zero", color = color.new(color.black, 20))
+hline(extremeZ, "+Extreme", color = EXTREME_LINE, linestyle = hline.style_dashed)
+hline(-extremeZ, "-Extreme", color = EXTREME_LINE, linestyle = hline.style_dashed)
+
+// ----- Fade-from-extreme events
+// A fade is the FIRST bar back inside the threshold after being outside it.
+bool fadeFromPositive = not na(z[1]) and z[1] >= extremeZ and z < extremeZ
+bool fadeFromNegative = not na(z[1]) and z[1] <= -extremeZ and z > -extremeZ
+
+// Small markers inside the indicator pane.
+plotshape(
+     showFadeMarkers and fadeFromPositive,
+     title = "Fade from +Extreme",
+     style = shape.triangledown,
+     location = location.top,
+     color = POSITIVE_EXTREME,
+     size = size.tiny,
+     text = "FADE",
+     textcolor = color.white
+)
+
+plotshape(
+     showFadeMarkers and fadeFromNegative,
+     title = "Fade from -Extreme",
+     style = shape.triangleup,
+     location = location.bottom,
+     color = NEGATIVE_EXTREME,
+     size = size.tiny,
+     text = "FADE",
+     textcolor = color.white
+)
+
+// Optional labels on the main chart.
+// To keep the labels aligned with the target's actual price bars, they are
+// enabled only when:
+//   1) the chart symbol itself is the target, and
+//   2) the chart timeframe matches the selected analysis timeframe.
+bool canOverlayFadeLabels =
+     showPriceChartFadeLabels and
+     useChartTarget and
+     timeframe.period == analysisTf
+
+plotshape(
+     canOverlayFadeLabels and fadeFromPositive,
+     title = "Price chart: fade from +Extreme",
+     style = shape.labeldown,
+     location = location.abovebar,
+     color = POSITIVE_EXTREME,
+     text = "Fade +Extreme",
+     textcolor = color.white,
+     size = size.tiny,
+     force_overlay = true
+)
+
+plotshape(
+     canOverlayFadeLabels and fadeFromNegative,
+     title = "Price chart: fade from -Extreme",
+     style = shape.labelup,
+     location = location.belowbar,
+     color = NEGATIVE_EXTREME,
+     text = "Fade -Extreme",
+     textcolor = color.white,
+     size = size.tiny,
+     force_overlay = true
+)
+
+// Optional alert hooks for the two fade events.
+alertcondition(
+     fadeFromPositive,
+     title = "Pair spread faded from +Extreme",
+     message = "Pair spread has moved back inside the positive extreme threshold."
+)
+
+alertcondition(
+     fadeFromNegative,
+     title = "Pair spread faded from -Extreme",
+     message = "Pair spread has moved back inside the negative extreme threshold."
+)
