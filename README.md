@@ -77,7 +77,7 @@ The script:
 
 ![SPY vs DIA price spread](src/spy_vs_dia.png)
 
-You can also try the indicator on Tradingview via [`src/pair_spread_indicator_pinescript`](src/pair_spread_indicator_pinescript)
+You can also try the indicator on Tradingview via [`src/price_spread_indicator_pinescript`](src/price_spread_indicator_pinescript)
 <img width="1808" height="822" alt="image" src="https://github.com/user-attachments/assets/452f3c38-b03f-4192-bd0c-14db75e39e05" />
 
 The simplified calculation is:
